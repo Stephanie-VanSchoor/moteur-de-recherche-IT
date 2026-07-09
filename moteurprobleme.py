@@ -438,6 +438,12 @@ with st.sidebar.expander("📜 Licence"):
     Sous licence MIT - Utilisation libre  
     [Voir la licence complète](https://github.com/stephanieleurquin/moteur-de-recherche-IT/blob/main/LICENSE)
     """)
+            # ===== AJOUT DU DISCLAIMER =====
+        st.warning("""
+        **⚠️ Avertissement**
+        Les diagnostics fournis par cet outil sont fournis à titre indicatif.
+        Ils ne remplacent pas l'avis d'un professionnel. L'utilisateur est seul responsable de l'application des procédures.
+        """)
 
 if __name__ == "__main__":
     main()
