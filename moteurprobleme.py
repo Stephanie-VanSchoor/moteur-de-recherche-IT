@@ -129,42 +129,30 @@ class RechercheIAPro:
             texte = texte.replace(ancien, nouveau)
         return texte
 
-    def rechercher_ia(self, question, top_k=10):
-        self.charger_base()
-        question = self.normaliser(question)
-        mots = re.findall(r"\w+", question)
+   def rechercher_ia(self, question, top_k=10):  # ← CHANGÉ
+    self.charger_base()
+    question = self.normaliser(question)
+    mots = re.findall(r"\w+", question)
 
-        resultats = []
-        for _, panne in self.df.iterrows():
-            score = 0
-            # Normalisation de tous les champs pertinents
-            titre = self.normaliser(panne["titre"])
-            tags = self.normaliser(panne["tags"])
-            description = self.normaliser(panne["description"])
-            diagnostic = self.normaliser(panne["diagnostic"])
-            procedure = self.normaliser(panne["procedure"])  # optionnel
+    resultats = []
+    for _, panne in self.df.iterrows():
+        score = 0
+        titre = self.normaliser(panne["titre"])
+        tags = self.normaliser(panne["tags"])
 
-            for mot in mots:
-                if len(mot) < 2:
-                    continue
-                if mot in titre:
-                    score += 10
-                if mot in tags:
-                    score += 8
-                if mot in description:
-                    score += 5
-                if mot in diagnostic:
-                    score += 5
-                if mot in procedure:
-                    score += 3
+        for mot in mots:
+            if len(mot) < 2:
+                continue
+            if mot in titre:
+                score += 10
+            if mot in tags:
+                score += 8
 
-            if score > 0:
-                resultats.append((dict(panne), score))
+        if score > 0:
+            resultats.append((dict(panne), score))
 
-        resultats.sort(key=lambda x: x[1], reverse=True)
-        return resultats[:top_k]
-
-# ==========================
+    resultats.sort(key=lambda x: x[1], reverse=True)
+    return resultats  # ← CHANGÉ (enlève le [:top_k])
 # INTERFACE PRINCIPALE
 # ==========================
 def main():
