@@ -203,12 +203,7 @@ def afficher_google_search():
 # ==========================
 # INTERFACE PRINCIPALE
 # ==========================
-def main():
-    init_db()
-    if 'recherche_pro' not in st.session_state:
-        st.session_state.recherche_pro = RechercheIAPro()
-
-    # Sidebar
+        # Sidebar
     with st.sidebar:
         st.markdown("### 🤖 Assistant IT Pro")
         st.markdown("---")
@@ -225,6 +220,18 @@ def main():
         - Précisez le contexte
         """)
 
+        # 🔥 AJOUTE CE BOUTON ICI 🔥
+        st.markdown("---")
+        if st.button("🔄 Réinitialiser la base de données", type="secondary"):
+            con = connexion()
+            cur = con.cursor()
+            cur.execute("DROP TABLE IF EXISTS pannes")
+            con.commit()
+            con.close()
+            init_db()  # Recrée la base avec 5 pannes
+            st.cache_data.clear()
+            st.success("✅ Base réinitialisée avec 5 pannes")
+            st.rerun()
         # Menu d'administration (ajout de pannes)
         with st.expander("⚙️ Administration (ajouter une panne)"):
             with st.form("ajout_panne"):
