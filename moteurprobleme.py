@@ -11,10 +11,13 @@ DB = "assistant_it_ia.db"
 # ==========================
 # CONNEXION SUPABASE
 # ==========================
+# ==========================
+# CONNEXION SUPABASE
+# ==========================
 
 supabase = create_client(
-    st.secrets["https://radepakkhrmwwnhlyhan.supabase.co"],
-    st.secrets["sb_publishable_01d8XQDlNstzgPLa8F0X2g_2Diii_T1"]
+    st.secrets["SUPABASE_URL"],
+    st.secrets["SUPABASE_KEY"]
 )
 
 # ==========================
