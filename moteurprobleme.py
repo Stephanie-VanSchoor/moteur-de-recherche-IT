@@ -30,13 +30,26 @@ DB = "assistant_it_pro.db"
 
 try:
 
-    from supabase import create_client
+# ==========================
+# SUPABASE
+# ==========================
 
+SUPABASE_OK = False
+supabase = None
+
+try:
+    from supabase import create_client
 
     supabase = create_client(
         st.secrets["SUPABASE_URL"],
         st.secrets["SUPABASE_KEY"]
     )
+
+    SUPABASE_OK = True
+
+except Exception as e:
+    st.warning("Connexion Supabase indisponible")
+    st.error(e)    
 
 
     SUPABASE_OK = True
