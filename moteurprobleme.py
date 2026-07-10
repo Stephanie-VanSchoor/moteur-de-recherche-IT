@@ -5,6 +5,8 @@ import numpy as np
 import re
 from datetime import datetime
 
+from supabase import create_client
+
 DB = "assistant_it_ia.db"
 
 # ==========================
