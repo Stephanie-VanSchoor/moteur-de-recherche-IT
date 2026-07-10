@@ -978,3 +978,42 @@ if __name__ == "__main__":
 
 
     main()
+    def verifier_plan():
+
+    if "user" not in st.session_state:
+        return "gratuit"
+
+
+    user = st.session_state.user
+
+
+    resultat = supabase.table(
+        "profiles"
+    ).select(
+        "plan"
+    ).eq(
+        "id",
+        user.id
+    ).execute()
+
+
+    if resultat.data:
+
+        return resultat.data[0]["plan"]
+
+
+    return "gratuit"
+    plan = verifier_plan()
+
+
+if plan != "premium":
+
+    st.warning(
+        "Version gratuite : 5 diagnostics par jour. Passez Premium pour un accès complet."
+    )
+    supabase.auth.sign_in_with_password(
+{
+"email":email,
+"password":password
+}
+)
