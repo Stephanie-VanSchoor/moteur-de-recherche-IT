@@ -2848,7 +2848,7 @@ def generer_word_resultats(resultats, question):
 
     buffer = BytesIO()
     doc.save(buffer)
-    return buffer.getvalue()=================================================
+    return buffer.getvalue()
 
 
 # ==================================================
