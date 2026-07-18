@@ -112,45 +112,26 @@ OFFRES = {
                      "Support 24/7", "Accès API", "5 comptes inclus"]
     }
 }
-
-# ==================================================
-# BASE DE DONNEES
-# ==================================================
-
-def connexion_db():
-    return sqlite3.connect(DB)
-
 def creer_base():
     conn = connexion_db()
     cur = conn.cursor()
+    
+    # Table pannes
     cur.execute("""
-                CREATE TABLE IF NOT EXISTS pannes
-                (
-                    id
-                    INTEGER
-                    PRIMARY
-                    KEY
-                    AUTOINCREMENT,
-                    titre
-                    TEXT,
-                    description
-                    TEXT,
-                    diagnostic
-                    TEXT,
-                    procedure
-                    TEXT,
-                    questions
-                    TEXT,
-                    categorie
-                    TEXT,
-                    niveau
-                    INTEGER,
-                    tags
-                    TEXT
-                )
-                """)
-       
-    # Table entreprises (NOUVELLE)
+        CREATE TABLE IF NOT EXISTS pannes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            titre TEXT,
+            description TEXT,
+            diagnostic TEXT,
+            procedure TEXT,
+            questions TEXT,
+            categorie TEXT,
+            niveau INTEGER,
+            tags TEXT
+        )
+    """)
+    
+    # Table entreprises
     cur.execute("""
         CREATE TABLE IF NOT EXISTS entreprises (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -160,24 +141,24 @@ def creer_base():
         )
     """)
     
-    # Table utilisateurs (MODIFIÉE)
-   # Table utilisateurs (avec entreprise_id, role, et abonnement_expire_le)
-cur.execute("""
-    CREATE TABLE IF NOT EXISTS utilisateurs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE,
-        password TEXT,
-        plan TEXT DEFAULT 'gratuit',
-        premium INTEGER DEFAULT 0,
-        recherches INTEGER DEFAULT 0,
-        date_inscription TEXT,
-        entreprise_id INTEGER,
-        role TEXT DEFAULT 'membre',
-        abonnement_expire_le TEXT,
-        FOREIGN KEY (entreprise_id) REFERENCES entreprises (id)
-    )
-""")
-    # Table invitations (NOUVELLE)
+    # Table utilisateurs (avec abonnement_expire_le)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS utilisateurs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE,
+            password TEXT,
+            plan TEXT DEFAULT 'gratuit',
+            premium INTEGER DEFAULT 0,
+            recherches INTEGER DEFAULT 0,
+            date_inscription TEXT,
+            entreprise_id INTEGER,
+            role TEXT DEFAULT 'membre',
+            abonnement_expire_le TEXT,
+            FOREIGN KEY (entreprise_id) REFERENCES entreprises (id)
+        )
+    """)
+    
+    # Table invitations
     cur.execute("""
         CREATE TABLE IF NOT EXISTS invitations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -189,37 +170,17 @@ cur.execute("""
             FOREIGN KEY (entreprise_id) REFERENCES entreprises (id)
         )
     """)
-    cur.execute("""
-                CREATE TABLE IF NOT EXISTS utilisateurs
-                (
-                    id
-                    INTEGER
-                    PRIMARY
-                    KEY
-                    AUTOINCREMENT,
-                    email
-                    TEXT
-                    UNIQUE,
-                    password
-                    TEXT,
-                    plan
-                    TEXT
-                    DEFAULT
-                    'gratuit',
-                    premium
-                    INTEGER
-                    DEFAULT
-                    0,
-                    recherches
-                    INTEGER
-                    DEFAULT
-                    0,
-                    date_inscription
-                    TEXT
-                )
-                """)
+    
     conn.commit()
+    
+    # Pour les bases existantes
+    try:
+        cur.execute("ALTER TABLE utilisateurs ADD COLUMN abonnement_expire_le TEXT")
+    except:
+        pass
+    
     conn.close()
+
 
 def remplir_base():
     conn = connexion_db()
@@ -227,7 +188,7 @@ def remplir_base():
     cur.execute("SELECT COUNT(*) FROM pannes")
     if cur.fetchone()[0] == 0:
         # Vos données ici (je les ai tronquées pour la lisibilité, mais gardez tout votre contenu)
-        donnees = [
+        donnees = [# j ai pris jusqu ici !!!!
              # Windows - Installation
             ("Windows ne s'installe pas", "L'installation de Windows échoue",
              "Problème de clé USB ou de pilote manquant",
