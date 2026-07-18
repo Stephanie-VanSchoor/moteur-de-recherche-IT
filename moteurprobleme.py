@@ -2756,9 +2756,7 @@ class RechercheIT:
         resultats.sort(key=lambda x: x[1], reverse=True)
         return resultats[:10]
 
-# ==================================================
-# FONCTIONS D'EXPORT DES RÉSULTATS
-# =# ==================================================
+# ===================================================
 # FONCTIONS D'EXPORT DES RÉSULTATS
 # ==================================================
 
