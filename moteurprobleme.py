@@ -2758,6 +2758,8 @@ class RechercheIT:
 
 # ==================================================
 # FONCTIONS D'EXPORT DES RÉSULTATS
+# =# ==================================================
+# FONCTIONS D'EXPORT DES RÉSULTATS
 # ==================================================
 
 def generer_pdf_resultats(resultats, question):
@@ -2765,6 +2767,7 @@ def generer_pdf_resultats(resultats, question):
         from reportlab.lib.pagesizes import A4
         from reportlab.pdfgen import canvas
         from reportlab.lib.utils import simpleSplit
+        from io import BytesIO
     except ImportError:
         st.error("❌ La bibliothèque 'reportlab' n'est pas installée.")
         return None
@@ -2812,10 +2815,12 @@ def generer_pdf_resultats(resultats, question):
     c.save()
     return buffer.getvalue()
 
+
 def generer_word_resultats(resultats, question):
     try:
         import docx
         from docx.shared import Pt
+        from io import BytesIO
     except ImportError:
         st.error("❌ La bibliothèque 'python-docx' n'est pas installée.")
         return None
@@ -2845,7 +2850,8 @@ def generer_word_resultats(resultats, question):
 
     buffer = BytesIO()
     doc.save(buffer)
-    return buffer.getvalue()
+    return buffer.getvalue()=================================================
+
 
 # ==================================================
 # AUTHENTIFICATION
