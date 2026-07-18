@@ -2855,31 +2855,36 @@ def generer_word_resultats(resultats, question):
 # ==================================================
 # AUTHENTIFICATION
 # ==================================================
-
-def inscription(email, password):
-    conn = connexion_db()
-    cur = conn.cursor()
-    try:
-        pwd = hashlib.sha256(password.encode()).hexdigest()
-        cur.execute(
-            "INSERT INTO utilisateurs (email, password, plan, premium, recherches, date_inscription) VALUES (?, ?, 'gratuit', 0, 0, ?)",
-            (email, pwd, date.today().isoformat())
-        )
-        conn.commit()
-        conn.close()
-        return True
-    except:
-        conn.close()
-        return False
-
 def connexion_utilisateur(email, password):
     conn = connexion_db()
     cur = conn.cursor()
     pwd = hashlib.sha256(password.encode()).hexdigest()
     cur.execute("SELECT * FROM utilisateurs WHERE email = ? AND password = ?", (email, pwd))
     user = cur.fetchone()
+    
+    if user:
+        # Vérifier si l'abonnement a expiré (index 9 = abonnement_expire_le)
+        expire_le = user[9] if len(user) > 9 else None
+        if expire_le:
+            try:
+                date_expiration = datetime.fromisoformat(expire_le)
+                if datetime.now() > date_expiration:
+                    # L'abonnement a expiré -> rétrograder en gratuit
+                    cur.execute("""
+                        UPDATE utilisateurs 
+                        SET plan = 'gratuit', premium = 0, abonnement_expire_le = NULL 
+                        WHERE email = ?
+                    """, (email,))
+                    conn.commit()
+                    # Recharger l'utilisateur
+                    cur.execute("SELECT * FROM utilisateurs WHERE email = ? AND password = ?", (email, pwd))
+                    user = cur.fetchone()
+            except:
+                pass
+    
     conn.close()
     return user
+
 
 def mise_a_jour_plan(email, plan):
     conn = connexion_db()
