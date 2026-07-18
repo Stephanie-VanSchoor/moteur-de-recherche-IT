@@ -6,6 +6,8 @@ from datetime import datetime, date
 import hashlib
 import random
 import string
+from io import BytesIO
+import textwrap
 
 
 # ==================================================
@@ -2757,7 +2759,99 @@ class RechercheIT:
         resultats.sort(key=lambda x: x[1], reverse=True)
         return resultats[:10]
 
+# ==================================================
+# FONCTIONS D'EXPORT DES RÉSULTATS
+# ==================================================
 
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import simpleSplit
+from io import BytesIO
+import docx
+from docx.shared import Pt
+
+def generer_pdf_resultats(resultats, question):
+    """
+    Génère un fichier PDF contenant les résultats de recherche.
+    Retourne les bytes du PDF.
+    """
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+    largeur, hauteur = A4
+    y = hauteur - 50
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(50, y, "Résultats de recherche - Assistant IT Pro")
+    y -= 30
+    c.setFont("Helvetica", 12)
+    c.drawString(50, y, f"Question posée : {question}")
+    y -= 20
+    c.drawString(50, y, f"{len(resultats)} résultat(s) trouvé(s)")
+    y -= 30
+
+    for i, (panne, score) in enumerate(resultats, 1):
+        if y < 100:
+            c.showPage()
+            y = hauteur - 50
+            c.setFont("Helvetica", 12)
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(50, y, f"{i}. {panne['titre']} (Score: {score})")
+        y -= 20
+        c.setFont("Helvetica", 10)
+        texte = f"Catégorie : {panne['categorie']}"
+        c.drawString(60, y, texte)
+        y -= 15
+        texte = f"Diagnostic : {panne['diagnostic']}"
+        # Gérer le texte long
+        lignes = simpleSplit(texte, "Helvetica", 10, largeur - 100)
+        for ligne in lignes:
+            c.drawString(60, y, ligne)
+            y -= 15
+        texte = f"Procédure : {panne['procedure']}"
+        lignes = simpleSplit(texte, "Helvetica", 10, largeur - 100)
+        for ligne in lignes:
+            c.drawString(60, y, ligne)
+            y -= 15
+        if panne.get('questions'):
+            c.drawString(60, y, f"Questions : {panne['questions']}")
+            y -= 15
+        y -= 10
+
+    c.save()
+    return buffer.getvalue()
+
+
+def generer_word_resultats(resultats, question):
+    """
+    Génère un fichier Word (.docx) contenant les résultats de recherche.
+    Retourne les bytes du fichier.
+    """
+    doc = docx.Document()
+    doc.add_heading("Résultats de recherche - Assistant IT Pro", 0)
+    doc.add_paragraph(f"Question posée : {question}")
+    doc.add_paragraph(f"{len(resultats)} résultat(s) trouvé(s)")
+    doc.add_paragraph()
+
+    for i, (panne, score) in enumerate(resultats, 1):
+        doc.add_heading(f"{i}. {panne['titre']} (Score: {score})", level=1)
+        p = doc.add_paragraph()
+        p.add_run("Catégorie : ").bold = True
+        p.add_run(panne['categorie'])
+        p = doc.add_paragraph()
+        p.add_run("Diagnostic : ").bold = True
+        p.add_run(panne['diagnostic'])
+        p = doc.add_paragraph()
+        p.add_run("Procédure : ").bold = True
+        p.add_run(panne['procedure'])
+        if panne.get('questions'):
+            p = doc.add_paragraph()
+            p.add_run("Questions : ").bold = True
+            p.add_run(panne['questions'])
+        doc.add_paragraph()
+
+    # Sauvegarder dans un buffer bytes
+    buffer = BytesIO()
+    doc.save(buffer)
+    return buffer.getvalue()
 # ==================================================
 # AUTHENTIFICATION
 # ==================================================
