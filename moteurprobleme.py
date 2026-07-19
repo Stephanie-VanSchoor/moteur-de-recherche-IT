@@ -112,8 +112,19 @@ OFFRES = {
                      "Support 24/7", "Accès API", "5 comptes inclus"]
     }
 }
+
+# 👇 COLLEZ ICI 👇
+def connexion_db():
+    try:
+        conn = sqlite3.connect(DB)
+        return conn
+    except sqlite3.Error as e:
+        st.error(f"Erreur de connexion : {e}")
+        return None
 def creer_base():
     conn = connexion_db()
+    if conn is None:
+        return
     cur = conn.cursor()
     
     # Table pannes
