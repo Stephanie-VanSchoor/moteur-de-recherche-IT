@@ -21,7 +21,13 @@ st.set_page_config(
 )
 
 DB = "assistant_it_pro.db"
-
+def connexion_db():  # 👈 METTEZ LA FONCTION ICI
+    try:
+        conn = sqlite3.connect(DB)
+        return conn
+    except sqlite3.Error as e:
+        st.error(f"Erreur de connexion : {e}")
+        return None
 # ==================================================
 # CSS
 # ==================================================
