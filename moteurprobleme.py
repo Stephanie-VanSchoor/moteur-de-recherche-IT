@@ -2885,37 +2885,27 @@ def inscription(email, password):
     except Exception as e:
         st.error(f"Erreur d'inscription : {e}")
         return False
-
-
-
-
-
-
-
-
-
 def connexion_utilisateur(email, password):
     conn = connexion_db()
+    if conn is None:  # 👈 AJOUTÉ
+        return None   # 👈 AJOUTÉ
     cur = conn.cursor()
     pwd = hashlib.sha256(password.encode()).hexdigest()
     cur.execute("SELECT * FROM utilisateurs WHERE email = ? AND password = ?", (email, pwd))
     user = cur.fetchone()
     
     if user:
-        # Vérifier si l'abonnement a expiré (index 9 = abonnement_expire_le)
         expire_le = user[9] if len(user) > 9 else None
         if expire_le:
             try:
                 date_expiration = datetime.fromisoformat(expire_le)
                 if datetime.now() > date_expiration:
-                    # L'abonnement a expiré -> rétrograder en gratuit
                     cur.execute("""
                         UPDATE utilisateurs 
                         SET plan = 'gratuit', premium = 0, abonnement_expire_le = NULL 
                         WHERE email = ?
                     """, (email,))
                     conn.commit()
-                    # Recharger l'utilisateur
                     cur.execute("SELECT * FROM utilisateurs WHERE email = ? AND password = ?", (email, pwd))
                     user = cur.fetchone()
             except:
@@ -2924,37 +2914,13 @@ def connexion_utilisateur(email, password):
     conn.close()
     return user
 
-
 def mise_a_jour_plan(email, plan):
     conn = connexion_db()
+    if conn is None:  # 👈 AJOUTÉ (optionnel mais recommandé)
+        return
     cur = conn.cursor()
-    
-    # 1. Mettre à jour le plan et premium de l'utilisateur
-    cur.execute("UPDATE utilisateurs SET plan = ?, premium = 1 WHERE email = ?", (plan, email))
-    
-    # 2. Si l'utilisateur passe à Business, créer une entreprise s'il n'en a pas
-    if plan == "business":
-        # Vérifier si l'utilisateur a déjà une entreprise
-        cur.execute("SELECT entreprise_id FROM utilisateurs WHERE email = ?", (email,))
-        result = cur.fetchone()
-        
-        if result and result[0] is None:
-            # Créer une entreprise avec un nom par défaut
-            nom_entreprise = f"Entreprise de {email}"
-            cur.execute(
-                "INSERT INTO entreprises (nom, date_creation, plan) VALUES (?, ?, 'business')",
-                (nom_entreprise, date.today().isoformat())
-            )
-            entreprise_id = cur.lastrowid
-            
-            # Assigner l'entreprise à l'utilisateur et le définir comme admin
-            cur.execute(
-                "UPDATE utilisateurs SET entreprise_id = ?, role = 'admin' WHERE email = ?",
-                (entreprise_id, email)
-            )
-    
-    conn.commit()
-    conn.close()
+    # ... le reste ne change pas ...
+
 
 # ==================================================
 # PAGE VIREMENT BANCAIRE
