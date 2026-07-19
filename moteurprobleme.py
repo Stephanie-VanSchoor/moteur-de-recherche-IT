@@ -195,9 +195,11 @@ def creer_base():
 
 def remplir_base():
     conn = connexion_db()
+    if conn is None:  # ✅ AJOUTEZ CES 2 LIGNES
+        return        # ✅ 
     cur = conn.cursor()
     cur.execute("SELECT COUNT(*) FROM pannes")
-    if cur.fetchone()[0] == 0:
+    # ...
         # Vos données ici (je les ai tronquées pour la lisibilité, mais gardez tout votre contenu)
         donnees = [# j ai pris jusqu ici !!!!
              # Windows - Installation
