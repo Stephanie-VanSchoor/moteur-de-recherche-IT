@@ -2866,6 +2866,34 @@ def generer_word_resultats(resultats, question):
 # ==================================================
 # AUTHENTIFICATION
 # ==================================================
+def inscription(email, password):
+    try:
+        conn = connexion_db()
+        if conn is None:
+            return False
+        cur = conn.cursor()
+        pwd = hashlib.sha256(password.encode()).hexdigest()
+        cur.execute(
+            "INSERT INTO utilisateurs (email, password, plan, premium, recherches, date_inscription) VALUES (?, ?, 'gratuit', 0, 0, ?)",
+            (email, pwd, date.today().isoformat())
+        )
+        conn.commit()
+        conn.close()
+        return True
+    except sqlite3.IntegrityError:
+        return False
+    except Exception as e:
+        st.error(f"Erreur d'inscription : {e}")
+        return False
+
+
+
+
+
+
+
+
+
 def connexion_utilisateur(email, password):
     conn = connexion_db()
     cur = conn.cursor()
