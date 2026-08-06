@@ -3267,7 +3267,7 @@ def main():
         '<p style="color:#00d4ff; font-size:48px; font-weight:900; text-align:center;">🔧 Assistant Dépannage IT</p>',
         unsafe_allow_html=True)
     st.markdown(
-        '<p style="color:#aaa; text-align:center; font-size:18px;">Par IT Pro Solutions - <span style="color:#FFD700;">150+ diagnostics</span></p>',
+        '<p style="color:#aaa; text-align:center; font-size:18px;">Par IT Pro Solutions - <span style="color:#FFD700;">1000+ diagnostics</span></p>',
         unsafe_allow_html=True)
     st.markdown("---")
 
